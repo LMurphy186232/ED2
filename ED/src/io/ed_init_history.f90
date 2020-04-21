@@ -347,8 +347,15 @@ module ed_init_history
                            !---------------------------------------------------------------!
                         else
                            cpatch%ncohorts = 0
-                        endif
+                        end if
+                        !------------------------------------------------------------------!
+
+
+                        !----- Update the cohort count (may be redundant as well...) ------!
+                        csite%cohort_count(ipa) = cpatch%ncohorts
+                        !------------------------------------------------------------------!
                      end do patchloop
+                     !---------------------------------------------------------------------!
                   else
                      write (unit=*,fmt='(a)'          ) '---------------------------------'
                      write (unit=*,fmt='(a)'          ) ' Found a site with no patches.'
@@ -1211,6 +1218,14 @@ module ed_init_history
                         ,'MMEAN_STRUCT_SOIL_N_PY    ',dsetrank,iparallel,.false.,foundvar)
          call hdf_getslab_r(cgrid%mmean_mineral_soil_n (ipy:ipy)                           &
                         ,'MMEAN_MINERAL_SOIL_N_PY   ',dsetrank,iparallel,.false.,foundvar)
+         call hdf_getslab_r(cgrid%mmean_fgc_in         (ipy:ipy)                           &
+                        ,'MMEAN_FGC_IN_PY           ',dsetrank,iparallel,.false.,foundvar)
+         call hdf_getslab_r(cgrid%mmean_fsc_in         (ipy:ipy)                           &
+                        ,'MMEAN_FSC_IN_PY           ',dsetrank,iparallel,.false.,foundvar)
+         call hdf_getslab_r(cgrid%mmean_stgc_in        (ipy:ipy)                           &
+                        ,'MMEAN_STGC_IN_PY          ',dsetrank,iparallel,.false.,foundvar)
+         call hdf_getslab_r(cgrid%mmean_stsc_in        (ipy:ipy)                           &
+                        ,'MMEAN_STSC_IN_PY          ',dsetrank,iparallel,.false.,foundvar)
          call hdf_getslab_r(cgrid%mmean_gpp            (ipy:ipy)                           &
                         ,'MMEAN_GPP_PY              ',dsetrank,iparallel,.false.,foundvar)
          call hdf_getslab_r(cgrid%mmean_npp            (ipy:ipy)                           &
@@ -3783,9 +3798,9 @@ module ed_init_history
       call hdf_getslab_r(csite%cbudget_initialstorage                                      &
                      ,'CBUDGET_INITIALSTORAGE      ',dsetrank,iparallel,.true. ,foundvar)
       call hdf_getslab_r(csite%cbudget_residual                                            &
-                     ,'CBUDGET_COMMITTED           ',dsetrank,iparallel,.true. ,foundvar)
-      call hdf_getslab_r(csite%cbudget_committed                                           &
                      ,'CBUDGET_RESIDUAL            ',dsetrank,iparallel,.true. ,foundvar)
+      call hdf_getslab_r(csite%cbudget_committed                                           &
+                     ,'CBUDGET_COMMITTED           ',dsetrank,iparallel,.true. ,foundvar)
       call hdf_getslab_r(csite%commit_storage_resp                                         &
                      ,'COMMIT_STORAGE_RESP         ',dsetrank,iparallel,.true. ,foundvar)
       call hdf_getslab_r(csite%commit_growth_resp                                          &
@@ -4125,6 +4140,14 @@ module ed_init_history
                         ,'MMEAN_STRUCT_SOIL_N_PA    ',dsetrank,iparallel,.false.,foundvar)
          call hdf_getslab_r(csite%mmean_mineral_soil_n                                     &
                         ,'MMEAN_MINERAL_SOIL_N_PA   ',dsetrank,iparallel,.false.,foundvar)
+         call hdf_getslab_r(csite%mmean_fgc_in                                             &
+                        ,'MMEAN_FGC_IN_PA           ',dsetrank,iparallel,.false.,foundvar)
+         call hdf_getslab_r(csite%mmean_fsc_in                                             &
+                        ,'MMEAN_FSC_IN_PA           ',dsetrank,iparallel,.false.,foundvar)
+         call hdf_getslab_r(csite%mmean_stgc_in                                            &
+                        ,'MMEAN_STGC_IN_PA          ',dsetrank,iparallel,.false.,foundvar)
+         call hdf_getslab_r(csite%mmean_stsc_in                                            &
+                        ,'MMEAN_STSC_IN_PA          ',dsetrank,iparallel,.false.,foundvar)
          call hdf_getslab_r(csite%mmean_co2_residual                                       &
                         ,'MMEAN_CO2_RESIDUAL_PA     ',dsetrank,iparallel,.false.,foundvar)
          call hdf_getslab_r(csite%mmean_energy_residual                                    &

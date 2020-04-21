@@ -79,7 +79,7 @@ npartial=300                  # Maximum number of polygons to include in this bu
                               #    (actual number will be adjusted for total number of 
                               #     polygons if needed be).
 dttask=2                      # Time to wait between task submission
-runtime="00:00:00"            # Requested runtime.  Zero uses the queue's maximum.
+runtime="00:00:00"         # Requested runtime.  Zero uses the queue's maximum.
 #------------------------------------------------------------------------------------------#
 
 #==========================================================================================#
@@ -583,6 +583,13 @@ echo "echo \" Executable:      \${exec}\""                                     >
 echo "echo \"--------------------------------------------------------------\"" >> ${sbatch}
 echo "echo \"\""                                                               >> ${sbatch}
 echo "echo \"\""                                                               >> ${sbatch}
+echo ""                                                                        >> ${sbatch}
+echo ""                                                                        >> ${sbatch}
+echo "#--- Define home in case home is not set"                                >> ${sbatch}
+echo "if [[ \"x\${HOME}\" == \"x\" ]]"                                         >> ${sbatch}
+echo "then"                                                                    >> ${sbatch}
+echo "   export HOME=\$(echo ~)"                                               >> ${sbatch}
+echo "fi"                                                                      >> ${sbatch}
 echo ""                                                                        >> ${sbatch}
 echo "#--- Load modules and settings."                                         >> ${sbatch}
 echo ". \${HOME}/.bashrc ${optsrc}"                                            >> ${sbatch}
@@ -1366,13 +1373,13 @@ do
    Tanguro_Burn)
       metdriverdb="${fullscen}/Tanguro_Burn/Tanguro_Burn_HEADER"
       metcyc1=2008
-      metcycf=2017
+      metcycf=2018
       imetavg=1
       ;;
    Tanguro_Ctrl)
       metdriverdb="${fullscen}/Tanguro_Ctrl/Tanguro_Ctrl_HEADER"
       metcyc1=2008
-      metcycf=2017
+      metcycf=2018
       imetavg=1
       ;;
    Tonzi)
