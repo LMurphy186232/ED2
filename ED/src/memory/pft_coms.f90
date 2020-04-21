@@ -681,6 +681,8 @@ module pft_coms
    !< DBH-sapwood area allometry slope
    !----- Minimum DBH attainable by this PFT. ---------------------------------------------!
    real   , dimension(n_pft)    :: min_dbh
+   !----- Maximum DBH attainable by this PFT. ---------------------------------------------!
+   real   , dimension(n_pft)    :: max_dbh
    !----- Critical DBH for height/bdead, point in which plants stop growing vertically. ---!
    real   , dimension(n_pft)    :: dbh_crit
    !----- Prescribed DBH for the big leaf model, that allows a reasonable LAI/biomass. ----!

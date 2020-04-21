@@ -101,6 +101,7 @@ module ed_state_vars
       !  15 | Araucaria                           |     no |      yes |     yes |       no !
       !  16 | Tropical C3 grass                   |    yes |      yes |      no |      yes !
       !  17 | Liana                               |     no |      yes |      no |       no !
+      !  18 | Palm                                |     no |      yes |      no |       no |
       !------------------------------------------------------------------------------------!
       integer ,pointer,dimension(:) :: pft
       !<Plant functional type, refer to ed_params.f90 for default values\n
@@ -124,6 +125,7 @@ module ed_state_vars
       !! <tr><td>15     <td>Araucaria               <td>no      <td>yes         <td>yes     <td>no
       !! <tr><td>16     <td>Tropical C3 Grass       <td>yes     <td>yes         <td>no      <td>yes
       !! <tr><td>17     <td>Tropical Lianas         <td>no      <td>yes         <td>no      <td>no 
+      !! <tr><td>18     <td>Palm                    <td>no      <td>yes         <td>no      <td>no
       !! </table>
 
 

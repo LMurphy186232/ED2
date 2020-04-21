@@ -50,6 +50,7 @@ subroutine load_ed_ecosystem_params()
    !  15 | Araucaria                       |    no |    no |      yes |       no |     yes !
    !  16 | Tropical C3 grass               |   yes |    no |      yes |       no |      no !
    !  17 | Liana                           |    no |   yes |      yes |       no |     yes !
+   !  18 | Palm                            |    no |    no |      yes |       no |      no !
    !---------------------------------------------------------------------------------------!
 
 
@@ -71,6 +72,7 @@ subroutine load_ed_ecosystem_params()
    pft_name16(15) = 'Araucaria       '
    pft_name16(16) = 'Subtrop_C3_grass'
    pft_name16(17) = 'Liana           '
+   pft_name16(18) = 'Palm            '
    !---------------------------------------------------------------------------------------!
 
 
@@ -84,7 +86,7 @@ subroutine load_ed_ecosystem_params()
    is_tropical(12:14) = .true.
    is_tropical(15)    = .true.
    is_tropical(16)    = .true.
-   is_tropical(17)    = .true.
+   is_tropical(17:18) = .true.
    !---------------------------------------------------------------------------------------!
 
 
@@ -96,7 +98,7 @@ subroutine load_ed_ecosystem_params()
    !---------------------------------------------------------------------------------------! 
    is_savannah(1:11)  = .false.
    is_savannah(12:14) = .true.
-   is_savannah(15:17) = .false.
+   is_savannah(15:18) = .false.
    !---------------------------------------------------------------------------------------!
 
 
@@ -106,6 +108,7 @@ subroutine load_ed_ecosystem_params()
    !---------------------------------------------------------------------------------------!
    is_liana(1:16)  = .false.
    is_liana(17)    = .true.
+   is_liana(18)    = .false.
    !---------------------------------------------------------------------------------------!
 
 
@@ -117,7 +120,7 @@ subroutine load_ed_ecosystem_params()
    is_conifer(6:8)   = .true.
    is_conifer(9:14)  = .false.
    is_conifer(15)    = .true.
-   is_conifer(16:17) = .false.
+   is_conifer(16:18) = .false.
    !---------------------------------------------------------------------------------------!
 
 
@@ -130,7 +133,7 @@ subroutine load_ed_ecosystem_params()
    is_grass(5)     = .true.
    is_grass(6:15)  = .false.
    is_grass(16)    = .true.
-   is_grass(17)    = .false.
+   is_grass(17:18) = .false.
    !---------------------------------------------------------------------------------------!
 
 
@@ -2441,6 +2444,7 @@ subroutine init_pft_alloc_params()
                              , hgt_ref               & ! intent(out)
                              , hgt_max               & ! intent(out)
                              , min_dbh               & ! intent(out)
+                             , max_dbh               & ! intent(out)
                              , dbh_crit              & ! intent(out)
                              , dbh_bigleaf           & ! intent(out)
                              , min_bdead             & ! intent(out)
@@ -2651,6 +2655,8 @@ subroutine init_pft_alloc_params()
                rho(ipft) = 0.615
             case (    4,14) ! Late-successional tropical/savannah.
                rho(ipft) = 0.790
+            case (      18) ! Palm
+               rho(ipft) = 0.31
             case default ! Just in case some PFT was forgotten, use global average
                rho(ipft) = rho_ref
             end select
@@ -2665,6 +2671,8 @@ subroutine init_pft_alloc_params()
                rho(ipft) = 0.71 ! 0.60
             case (    4,14)  ! Late-successional tropical/savannah.
                rho(ipft) = 0.90 ! 0.87
+            case (      18) ! Palm
+               rho(ipft) = 0.31
             case default ! Just in case some PFT was forgotten, use global average
                rho(ipft) = rho_ref
             end select
@@ -2709,6 +2717,8 @@ subroutine init_pft_alloc_params()
             leaf_turnover_rate(ipft) = 0.80621772
          case (4,14)     ! Late-successional tropical/savannah.
             leaf_turnover_rate(ipft) = 0.40146228
+         case (  18)     ! Palm - don't have an adjusted value for this
+            leaf_turnover_rate(ipft) = 0.36
          case default ! Just in case
             leaf_turnover_rate(ipft) = 1.3141913
          end select
@@ -2724,6 +2734,8 @@ subroutine init_pft_alloc_params()
             leaf_turnover_rate(ipft) = 0.50
          case (4,14)  ! Late-successional
             leaf_turnover_rate(ipft) = onethird
+         case (  18)     ! Palm
+               leaf_turnover_rate(ipft) = 0.36
          case default ! Just in case
             leaf_turnover_rate(ipft) = 0.50
          end select
@@ -2799,6 +2811,9 @@ subroutine init_pft_alloc_params()
             end if
             !------------------------------------------------------------------------------!
          end select
+         ! Palms - an egregious hack here
+         sla_s0(18) = 8.74
+         sla_s1(18) = 0.0
          !---------------------------------------------------------------------------------!
       else
          !---------------------------------------------------------------------------------!
@@ -2849,6 +2864,7 @@ subroutine init_pft_alloc_params()
 
    !----- Ratio between fine roots and leaves [kg_fine_roots/kg_leaves] -------------------!
    q(:) = merge(1.0,merge(0.3463,1.1274,is_conifer(:)),is_tropical(:) .or. is_grass(:))
+   q(18) = 0.5
    !---------------------------------------------------------------------------------------!
 
 
@@ -3265,6 +3281,7 @@ subroutine init_pft_alloc_params()
    hgt_max(:) = merge( merge(1.50        ,hgt_max_trop ,is_grass(:))                       &
                      , merge(0.95*b1Ht(:),0.999*b1Ht(:),is_grass(:))                       &
                      , is_tropical(:)                                )
+   hgt_max(18) = 25.0
    !---------------------------------------------------------------------------------------!
 
 
@@ -3279,6 +3296,12 @@ subroutine init_pft_alloc_params()
    end do
    !---------------------------------------------------------------------------------------!
 
+   !---------------------------------------------------------------------------------------!
+   !   MAX_DBH     -- maximum DBH allowed for the PFT. Traditionally DBH has not been      !
+   !   limited so most PFTs will be set with a very high number to preserve this behavior. !
+   !---------------------------------------------------------------------------------------!
+   max_dbh(1:17) = 1000.0
+   max_dbh(18)   = 30.0
 
    !---------------------------------------------------------------------------------------!
    !    This is the typical DBH that all big leaf plants will have.  Because the big-leaf  !

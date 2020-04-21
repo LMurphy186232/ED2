@@ -692,6 +692,10 @@ recursive subroutine read_ed_xml_config(filename)
            if(texist) hgt_max(myPFT) = sngloff(rval,tiny_offset)
            call getConfigREAL  ('min_dbh','pft',i,rval,texist)
            if(texist) min_dbh(myPFT) = sngloff(rval,tiny_offset)
+
+           call getConfigREAL  ('max_dbh','pft',i,rval,texist)
+           if(texist) max_dbh(myPFT) = sngloff(rval,tiny_offset)
+
            call getConfigREAL  ('dbh_crit','pft',i,rval,texist)
            if(texist) dbh_crit(myPFT) = sngloff(rval,tiny_offset)
            call getConfigREAL  ('dbh_bigleaf','pft',i,rval,texist)
@@ -2018,6 +2022,7 @@ subroutine write_ed_xml_config
         call putConfigREAL("hgt_min",    hgt_min(i))
         call putConfigREAL("hgt_max",    hgt_max(i))
         call putConfigREAL("min_dbh",    min_dbh(i))
+        call putConfigREAL("max_dbh",    max_dbh(i))
         call putConfigREAL("dbh_crit",   dbh_crit(i))
         call putConfigREAL("dbh_bigleaf",dbh_bigleaf(i))
 
