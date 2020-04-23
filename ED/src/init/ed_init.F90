@@ -13,7 +13,7 @@ module ed_init
       use ed_state_vars , only : edgrid_g  & ! structure
                                , gdpy      & ! intent(in)
                                , edtype    ! ! intent(in)
-      implicit none 
+      implicit none
       !----- Local variables --------------------------------------------------------------!
       integer               :: ifm
       integer               :: ipy
@@ -67,7 +67,7 @@ module ed_init
                                , slz                  ! ! intent(in)
       use mem_polygons  , only : maxsite              ! ! intent(in)
       use ed_misc_coms  , only : min_site_area        ! ! intent(in)
-      implicit none 
+      implicit none
       !----- Local variables --------------------------------------------------------------!
       type(edtype)     , pointer :: cgrid
       type(polygontype), pointer :: cpoly
@@ -94,7 +94,7 @@ module ed_init
          cgrid => edgrid_g(ifm)
 
          polyloop: do ipy=1,cgrid%npolygons
-         
+
             !----- Initialise load adjacency with dummy value. ----------------------------!
             cgrid%load_adjacency(ipy) = 0
 
@@ -195,7 +195,7 @@ module ed_init
             !     Not sure what these things do, just copying from hydrology...            !
             !------------------------------------------------------------------------------!
             !----- Part 1. ----------------------------------------------------------------!
-            Te = 0.0 
+            Te = 0.0
             do isi = 1,cpoly%nsites
                sc = cpoly%ntext_soil(nzg-1,isi)
                K0 = soil(sc)%slcons0
@@ -237,7 +237,7 @@ module ed_init
    ! with ones, so we do not need to worry about this here.                                !
    !---------------------------------------------------------------------------------------!
    subroutine soil_default_fill(cgrid,ifm,ipy)
-      
+
       use ed_state_vars , only : edtype      & ! structure
                                , polygontype ! ! structure
       use ed_work_vars  , only : work_v      ! ! structure
@@ -325,7 +325,7 @@ module ed_init
 #endif
       !----- Local variables --------------------------------------------------------------!
       integer                :: igr
-      integer                :: ping 
+      integer                :: ping
       !----- Local variables (MPI only). --------------------------------------------------!
 #if defined(RAMS_MPI)
       integer                :: ierr
@@ -382,7 +382,7 @@ module ed_init
 
       select case (ied_init_mode)
       case (-8,-1,0)
-      
+
          select case (ibigleaf)
          case (0)
             !----- Initialize everything with near-bare ground ----------------------------!
@@ -415,7 +415,11 @@ module ed_init
             end do
          end select
 
-      case (4)   
+      case(8)
+        write(unit=*,fmt='(a,i3.3)') ' + Initializing from ED restart file, modified type. Node: ',mynum
+        call read_ext_ed20_history_file
+
+      case (4)
          write(unit=*,fmt='(a,i3.3)') ' + Initializing from ED2.1 state file. Node: ',mynum
          call read_ed21_history_file
          select case (ibigleaf)
@@ -446,7 +450,7 @@ module ed_init
                call sas_to_bigleaf(edgrid_g(igr))
             end do
          end select
-         
+
       end select
 
 
@@ -638,7 +642,7 @@ module ed_init
             fhydraul(nnn) = 0.
          end if
          do k = 0,nzg
-         
+
             select case (ipercol)
             case (0,1)
                !----- Original form, constant with depth.  --------------------------------!
@@ -656,7 +660,7 @@ module ed_init
             slcons18(k,nnn) = dble(slcons1(k,nnn))
          end do
 
-         slden    (nnn) =  soil(nnn)%slden    
+         slden    (nnn) =  soil(nnn)%slden
       end do
 
       !----- Defining some snow thickness variables ---------------------------------------!
@@ -720,7 +724,7 @@ module ed_init
       integer                            :: slash
       integer                            :: endstr
       !------------------------------------------------------------------------------------!
-      
+
       if (ifm /=1 .or. n_poi /= 1 .or. cgrid%npolygons /= 1) return
       ipy = 1
       cpoly => cgrid%polygon(ipy)
@@ -787,7 +791,7 @@ module ed_init
       logical :: no_hyd   = .false.
 
       character(len=str_len) :: site_name,pss_name,css_name
-     
+
       type(edtype) :: cgrid
       type(polygontype),pointer :: cpoly
 
@@ -817,7 +821,7 @@ module ed_init
       ! init values
       if (associated(cgrid%load_adjacency)) cgrid%load_adjacency = 0
 
-     
+
       do ipy = 1,cgrid%npolygons
 
          cpoly => cgrid%polygon(ipy)
@@ -831,13 +835,13 @@ module ed_init
             print*,"setting ied_init_mode to 2 and loading as single site"
          end if
 
-         
+
          ! If there is no terrestrial site
          if(.not. fexist) then  !! have no site file or ied_init_mode is not 3
 
             ! Allocate single site vector information to
             ! the swap polygon
-            
+
             call allocate_polygontype(cpoly,1)
             call soil_default_fill(cgrid,igr,ipy)
 
@@ -871,13 +875,13 @@ module ed_init
 
             !/* read file format line */
             read(unit=12,fmt=*)cdummy,nsites,cdummy2,fformat
-            !/*line format: "nsites <nsites> format <fformat>" */   
-            
+            !/*line format: "nsites <nsites> format <fformat>" */
+
    !         print*,"reading",nsites,"sites using file format",fformat
 
             call allocate_polygontype(cpoly,nsites)
             call soil_default_fill(cgrid,igr,ipy)
-        
+
             if(fformat <=0 .or. fformat > 3) then
                print*,""
                print*,"ERROR :: unrecognized file format specifier in",site_name
@@ -889,10 +893,10 @@ module ed_init
 
             !/* discard file header line */
             read(unit=12,fmt=*)
-            
+
             !/* read data*/
             allocate(soilclass(nzg))
-            lcount = 0 
+            lcount = 0
             mcount = 0
             found_mat_header = 0
             isi = 0
@@ -900,16 +904,16 @@ module ed_init
             count_sites: do
 
                isi = isi + 1  ! The site counter
-               
+
                !           read(12,*,iostat=ierr)time,pname,trk,age,area,fsc,stsc,  &
                !                stsl,ssc,psc,msn,fsn,water(1:nwater)
                !           if(ierr /= 0)exit count_patches
-               
+
                lcount = lcount + 1 !! line counter
                get_site_line=0
                get_mat_line=0
                get_header=0 !! line flags
-               
+
                !/********* decide what type of line to read ***************/
                select case (fformat)
                case (1,3)
@@ -920,7 +924,7 @@ module ed_init
                   else                      !we're past data, discard
                      get_site_line=0
                      get_mat_line=0
-                     get_header=1             
+                     get_header=1
                   endif
                case (2)
                   if(lcount <= nsites) then  !know we're in the site section
@@ -937,24 +941,24 @@ module ed_init
                         get_mat_line = 0
                         get_header = 1
                      endif
-                  else 
-                     
+                  else
+
                      !!assume line is header, remove and then assume header found
-                     
+
                      get_site_line = 0
                      get_mat_line = 0
                      get_header = 1
                      found_mat_header=1
-                     
+
                   endif
-                  
+
                end select
 
    !            print*,"line indicators",get_site_line,get_mat_line,get_header
-       
+
                if(get_site_line == 1)then   !/********** READ SITE LINE ***************/
-                  
-                  !/* line format: sitenum, area, TCI, elevation, slope, aspect,ntext_soil(s) */              
+
+                  !/* line format: sitenum, area, TCI, elevation, slope, aspect,ntext_soil(s) */
                   read(unit=12,fmt=*,iostat=ierr)sitenum,area,TCI,elevation,slope,aspect,soilclass(1:nsc)
                   if(ierr == 0) then
                      !/*create data object for each new site */
@@ -987,7 +991,7 @@ module ed_init
                            cpoly%ntext_soil(i,isi) = soilclass(1)
                         end do
                      end if
-                     
+
                      !//Currently do nothing with setting site-level soils
 
                      sc = cpoly%ntext_soil(nzg-1,1)
@@ -1010,14 +1014,14 @@ module ed_init
                if(get_mat_line == 1) then
 
                   !/*read line into site adjacency matrix*/
-                  
+
                   read(unit=12,fmt=*,iostat=ierr) cgrid%site_adjacency(mcount,1:(nsites+1),ipy)
 
                   mcount = mcount+1
-                  
+
                endif
                if(ierr /= 0) exit count_sites
-           
+
             end do count_sites
             deallocate(soilclass)
          end if
@@ -1029,13 +1033,13 @@ module ed_init
          end if
 
 
-         if(cgrid%load_adjacency(ipy) /= 0) then  
+         if(cgrid%load_adjacency(ipy) /= 0) then
             call calc_flow_routing(cgrid,ipy)
          endif
 
          ! calculate summary stats - pass 1: Te
          ! On terrestrial site still
-         Te = 0.0 
+         Te = 0.0
          area_sum = 0.0d+0
          do isi = 1,cpoly%nsites
             sc = cpoly%ntext_soil(nzg-1,isi)
@@ -1082,11 +1086,11 @@ module ed_init
       integer :: nsites
 
       !if we loaded an adjacency matrix from file, we don't need to calculate flow routing
-      if(cgrid%load_adjacency(ipy) == 1) return   
+      if(cgrid%load_adjacency(ipy) == 1) return
 
       cpoly => cgrid%polygon(ipy)
       nsites=cpoly%nsites
-      
+
       allocate (hyrank(nsites))
 
       ! set flow routing -> sort by TCI, it will give the sites the hydro order
@@ -1114,14 +1118,14 @@ module ed_init
                + side/2.0*cpoly%area(ihys)/(cpoly%area(ihys)+cpoly%area(ines))
       cgrid%site_adjacency(ihys,ines,ipy) = side*cpoly%area(ines)/(cpoly%area(ihys)+cpoly%area(ihys))
 
-      !normalize routing (rows sum to 1)  
+      !normalize routing (rows sum to 1)
       do ihys=1,nsites
          row_sum=sum(dble(cgrid%site_adjacency(ihys,:,ipy)))
          cgrid%site_adjacency(ihys,:,ipy)=real(dble(cgrid%site_adjacency(ihys,:,ipy))/row_sum)
       end do
 
       !check routing
-   !   print*,"CHECK ROUTING" 
+   !   print*,"CHECK ROUTING"
    !   do i=1,myPolygon%nsites
    !      print*,cgrid%site_adjacency(i,:,ipy)
    !   end do
@@ -1182,7 +1186,7 @@ module ed_init
       !------------------------------------------------------------------------------------!
       !----- Quality control: UNITFAST & OUTFAST must be 0. -------------------------------!
       !------------------------------------------------------------------------------------!
-    
+
       if (unitfast /= 0) then
          write (unit=*,fmt='(a)') 'UNITFAST must be set to 0 for observation time output'
          call fatal_error('UNITFAST should be zero','read_obstime'                 &
@@ -1206,7 +1210,7 @@ module ed_init
       obstime_list_len = 0 ! initialize the length of obstime_list
       ferr = 0
 
-      ! Loop over the whole list 
+      ! Loop over the whole list
       ! Leave loop at the end of file (ferr /=0) or obstime_list is over the maximum length
       do while ((ferr .eq. 0) .and. (obstime_list_len .lt. max_obstime))
            time_idx = obstime_list_len + 1
@@ -1240,22 +1244,22 @@ module ed_init
            ! FIND ANALYSIS TIME: record the second of day of the closest analysis time
            ! note that we always round upward because the analysis file would
            ! include the average state/flux over the previous analysis period.
-           
+
            obstime_list(time_idx)%time  = real(ceiling((                           &
                        real(obstime_list(time_idx)%hour) * hr_sec                  &
                      + real(obstime_list(time_idx)%min)  * min_sec                 &
                      + real(obstime_list(time_idx)%sec)) / frqfast)) * frqfast
 
-           ! QUALITY CONTROL: Remove the entry if 
+           ! QUALITY CONTROL: Remove the entry if
            ! (1) it is outside the range of the simulation
            ! (2) it is the same as the last entry
-          
+
            ! auxiliary variables to determine whether the observation time is
            ! within the range of simulation periods
            time_hms = obstime_list(time_idx)%hour * 10000      &
                     + obstime_list(time_idx)%min * 100         &
                     + obstime_list(time_idx)%sec
-           
+
            ! Obstime - start time should be positive
            call date_2_seconds(obstime_list(time_idx)%year,obstime_list(time_idx)%month    &
                               ,obstime_list(time_idx)%date,time_hms                        &
@@ -1267,8 +1271,8 @@ module ed_init
                               ,obstime_list(time_idx)%date,time_hms                        &
                               ,iyearz,imonthz,idatez,itimez*100                            &
                               ,sec_2_end)
-          
-           remove_entry = (sec_2_start < 0 .or. sec_2_end > 0) 
+
+           remove_entry = (sec_2_start < 0 .or. sec_2_end > 0)
 
            if (time_idx > 1) then
                remove_entry = remove_entry .or.                                            &
@@ -1278,14 +1282,14 @@ module ed_init
                      .and. obstime_list(time_idx)%time == obstime_list(time_idx-1)%time    &
                          )
            end if
-          
+
            ! remove the current entry if remove_entry is true
            if (remove_entry) then
                call remove_obstime(time_idx)
                ! also roll back time_idx
                time_idx = time_idx - 1
            end if
-           
+
            ! increase time_idx
            time_idx = time_idx + 1
       end do
@@ -1314,21 +1318,21 @@ module ed_init
       !----- Local variables. -------------------------------------------------------------!
       integer  :: idx
       !------------------------------------------------------------------------------------!
-      
+
       ! Only remove the entry if it actually exists
       if (time_idx < obstime_list_len) then
-          
+
            ! move all the entries after time_idx forward
            do idx = time_idx + 1, obstime_list_len
                obstime_list(idx-1)%year    = obstime_list(idx)%year
                obstime_list(idx-1)%month   = obstime_list(idx)%month
-               obstime_list(idx-1)%date    = obstime_list(idx)%date 
-               obstime_list(idx-1)%hour    = obstime_list(idx)%hour 
-               obstime_list(idx-1)%min     = obstime_list(idx)%min  
-               obstime_list(idx-1)%sec     = obstime_list(idx)%sec  
-               obstime_list(idx-1)%time    = obstime_list(idx)%time 
+               obstime_list(idx-1)%date    = obstime_list(idx)%date
+               obstime_list(idx-1)%hour    = obstime_list(idx)%hour
+               obstime_list(idx-1)%min     = obstime_list(idx)%min
+               obstime_list(idx-1)%sec     = obstime_list(idx)%sec
+               obstime_list(idx-1)%time    = obstime_list(idx)%time
            enddo
-          
+
            ! decrease obstime_list_len
           obstime_list_len = obstime_list_len - 1
 
