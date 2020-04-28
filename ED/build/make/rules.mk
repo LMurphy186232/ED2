@@ -203,6 +203,11 @@ ed_read_ed10_20_history.o : $(ED_IO)/ed_read_ed10_20_history.f90
 	/bin/cp -f $< $(<F:.f90=.f90)
 	$(F90_COMMAND) $(<F:.f90=.f90)
 
+ed_read_ext_ed20_history.o : $(ED_IO)/ed_read_ext_ed20_history.f90
+	/bin/rm -f $(<F:.f90=.f90)
+	/bin/cp -f $< $(<F:.f90=.f90)
+	$(F90_COMMAND) $(<F:.f90=.f90)
+
 ed_read_ed21_history.o : $(ED_IO)/ed_read_ed21_history.f90
 	/bin/rm -f $(<F:.f90=.f90)
 	/bin/cp -f $< $(<F:.f90=.f90)

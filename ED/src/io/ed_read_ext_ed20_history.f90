@@ -479,7 +479,7 @@ subroutine read_ext_ed20_history_file
             read(unit=12,fmt=*,iostat=ierr) ctime(ic),cpname(ic),cname(ic),dbh(ic)      &
                                            ,hite(ic),ipft(ic),nplant(ic),bleaf(ic)      &
                                            ,broot(ic),bsapwooda(ic),bsapwoodb(ic)       &
-                                           ,bbarka(ic),bbarkb(ic),bdeada(ic),bdeadb(ic) &
+                                           ,bbarka(ic),bbarkb(ic),bdeada(ic),bdeadb(ic)
             !---------------------------------------------------------------------------!
             !     Check whether the file has hit the end, and if so, leave the loop.    !
             !---------------------------------------------------------------------------!
@@ -680,6 +680,7 @@ subroutine read_ext_ed20_history_file
                           cpatch%bbarkb(ic2)    = (1.-agf_bs(ipft(ic)))                      &
                                                 * cpatch%bleaf(ic2)                          &
                                                 * qbark(ipft(ic)) * cpatch%hite(ic2)
+                        end if
                         !------------------------------------------------------------------!
 
 

@@ -50,6 +50,7 @@ OBJ_MODEL =                        \
 	ed_para_init.o             \
 	ed_print.o                 \
 	ed_read_ed10_20_history.o  \
+        ed_read_ext_ed20_history.o \
 	ed_read_ed21_history.o     \
 	ed_state_vars.o            \
 	ed_therm_lib.o             \
